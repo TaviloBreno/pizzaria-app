@@ -1,4 +1,5 @@
 import prismaClent from "../../prisma";
+import { hash } from "bcryptjs";
 
 interface UserRequest{
     name: string;
@@ -22,11 +23,13 @@ class CreateUserService{
             throw new Error("User already exists!");
         }
 
+        const passwordHash = await hash(password, 8);
+
         const user = await prismaClent.user.create({
             data: {
                 name,
                 email,
-                password
+                password: passwordHash
             },
             select: {
                 id: true,
