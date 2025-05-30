@@ -2,15 +2,19 @@ import express, { NextFunction, Request, Response } from 'express';
 import { router } from './routes';
 import cors from 'cors';
 import path from 'path';
+import 'dotenv/config';
 
 const app = express();
 
 app.use(express.json());
-app.use(cors({
-    origin: '*',
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-}));
+app.use(
+  cors({
+    origin: "http://localhost:3000",
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
 
 app.use(router);
 app.use('/files', express.static(path.resolve(__dirname, '..', 'tmp')));

@@ -8,13 +8,15 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import Cookies from "js-cookie";
 
+const ImgLogo = "./logo.svg";
+
 export default function Page() {
   const router = useRouter();
   const [error, setError] = useState("");
 
   async function handleLogin(formData: FormData) {
-    const email = formData.get("email")?.toString() || "";
-    const password = formData.get("password")?.toString() || "";
+    const email = formData.get("email")?.toString().trim() || "";
+    const password = formData.get("password")?.toString().trim() || "";
 
     if (!email || !password) {
       setError("Preencha todos os campos.");
@@ -22,13 +24,16 @@ export default function Page() {
     }
 
     try {
-      type LoginResponse = { token: string };
-      const response = await api.post<LoginResponse>("/session", {
+      interface SessionResponse {
+        token: string;
+        [key: string]: any;
+      }
+      const response = await api.post<SessionResponse>("/session", {
         email,
         password,
       });
 
-      const token = response.data.token;
+      const token = response.data?.token;
 
       if (!token) {
         setError("Token não recebido.");
@@ -42,8 +47,11 @@ export default function Page() {
       });
 
       router.push("/dashboard");
-    } catch (err) {
-      console.error(err);
+    } catch (err: any) {
+      console.error(
+        "Erro ao realizar login:",
+        err.response?.data || err.message
+      );
       setError("Erro ao realizar login.");
     }
   }
@@ -51,7 +59,7 @@ export default function Page() {
   return (
     <div className={styles.containerCenter}>
       <Image
-        src="/logo.svg"
+        src={ImgLogo}
         alt="Logo da pizzaria"
         width={200}
         height={200}
@@ -59,7 +67,13 @@ export default function Page() {
       />
 
       <section className={styles.login}>
-        <form action={handleLogin}>
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            const formData = new FormData(e.currentTarget);
+            handleLogin(formData);
+          }}
+        >
           <input
             type="email"
             name="email"

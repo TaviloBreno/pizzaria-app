@@ -20,11 +20,12 @@ export function isAuthenticated(
   const [, token] = authToken.split(" ");
 
   try {
-    const { sub } = verify(token, process.env.JWT_SECRET as string) as Payload;
-    req.user_id = sub;
+    const decoded = verify(token, process.env.JWT_SECRET as string);
+    req.user_id = (decoded as any).sub;
     next();
   } catch (err) {
     res.status(401).json({ error: "Invalid token" });
     return;
   }
 }
+

@@ -16,6 +16,7 @@ import { SendOrderController } from "./controllers/order/SendOrderController";
 import { ListOrderController } from "./controllers/order/ListOrderControllers";
 import { DetailOrderController } from "./controllers/order/DetailOrderController";
 import { FinishOrderController } from "./controllers/order/FinishOrderController";
+import { DetailUserController } from "./controllers/user/DetailUserController";
 
 const router = Router();
 const upload = multer(uploadConfig.upload("./tmp"));
@@ -27,13 +28,24 @@ router.post(
   new CreateUserController().handle.bind(new CreateUserController())
 );
 
-router.post("/login", new AuthUserController().handle.bind(new AuthUserController()));
+router.post(
+  "/session",
+  new AuthUserController().handle.bind(new AuthUserController())
+);
 
-router.get("/me", isAuthenticated, new AuthUserController().handle.bind(new AuthUserController()));
+router.get("/me", isAuthenticated, new DetailUserController().handle.bind(new DetailUserController()));
 
 // Rotas de categorias
-router.post("/categories", isAuthenticated, new CreateCategoryController().handle.bind(new CreateCategoryController()));
-router.get("/categories", isAuthenticated, new ListCategoryController().handle.bind(new ListCategoryController()));
+router.post(
+  "/category",
+  isAuthenticated,
+  new CreateCategoryController().handle.bind(new CreateCategoryController())
+);
+router.get(
+  "/category",
+  isAuthenticated,
+  new ListCategoryController().handle.bind(new ListCategoryController())
+);
 
 // Rotas de produtos
 router.post("/product", isAuthenticated, upload.single('file'), new CreateProductController().handle.bind(new CreateProductController()));
